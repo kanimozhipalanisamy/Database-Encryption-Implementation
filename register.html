@@ -3,88 +3,186 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Signup</title>
+  <title>Signup - Database Encryption</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: Arial, sans-serif;
-      background: url('https://images.squarespace-cdn.com/content/v1/6059ef5d59f1411908292205/4370a25e-b47d-4647-a0fa-36fce5eb5ea5/Hacking-Cybersecurity.gif') no-repeat center center fixed;
-      background-size: cover;
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: #0a0a0a;
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
+      overflow: hidden;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.85;
     }
     .login-container {
-      background: rgb(215, 232, 238);
+      background: rgba(10, 10, 10, 0.9);
       padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 255, 128, 0.4);
+      max-width: 420px;
+      width: 90%;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease-in-out;
+    }
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, rgba(0, 255, 128, 0.1), rgba(0, 120, 255, 0.1));
+      z-index: -1;
+      animation: pulse 5s infinite;
+    }
+    .login-container:hover {
+      transform: translateY(-5px);
     }
     h1 {
       text-align: center;
-      font-size: 24px;
-      color: #222;
+      font-size: 26px;
+      color: #00ff80;
       margin-bottom: 30px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(0, 255, 128, 0.5);
     }
     .input-group {
       margin-bottom: 20px;
+      position: relative;
     }
     label {
       display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: #333;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #00ff80;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
     input {
       width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 2px solid #ccc;
+      padding: 12px 40px 12px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #00ff80;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
       outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    input:focus {
+      border-color: #0078ff;
+      box-shadow: 0 0 10px rgba(0, 120, 255, 0.5);
+    }
+    .input-group i {
+      position: absolute;
+      right: 12px;
+      top: 40px;
+      color: #00ff80;
+      font-size: 18px;
     }
     .login-button {
       width: 100%;
-      padding: 12px;
-      background: #2979ff;
-      color: white;
+      padding: 14px;
+      background: linear-gradient(90deg, #00ff80, #0078ff);
+      color: #0a0a0a;
       font-size: 16px;
+      font-weight: bold;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
     .login-button:hover {
-      background: #1565c0;
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 255, 128, 0.7);
     }
     .register-link {
       text-align: center;
       margin-top: 20px;
     }
     .register-link a {
-      color: #007bff;
+      color: #0078ff;
       text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+    .register-link a:hover {
+      color: #00ff80;
+      text-decoration: underline;
+    }
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #00ff80;
+      opacity: 0.5;
+      animation: scan 4s linear infinite;
+    }
+    @keyframes scan {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(100vh); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.5; }
+    }
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 20px;
+        max-width: 90%;
+      }
+      h1 {
+        font-size: 20px;
+      }
+      input, .login-button {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 <body>
+  <canvas id="hudCanvas"></canvas>
   <div class="login-container">
-    <h1>Database Encryption Implementation</h1>
+    <div class="scan-line"></div>
+    <h1>Database Encryption</h1>
     <form action="/register" method="post">
       <div class="input-group">
-        <label>Email address:</label>
-        <input type="email" name="username" placeholder="Enter your email" required>
+        <label>Email Address</label>
+        <input type="email" name="username" placeholder="Enter your email" required aria-label="Email address">
+        <i class="fas fa-envelope"></i>
       </div>
       <div class="input-group">
-        <label>Password:</label>
-        <input type="password" name="password" placeholder="Create a password" required>
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Create a password" required aria-label="Password">
+        <i class="fas fa-lock"></i>
       </div>
       <div class="input-group">
-        <label>Confirm Password:</label>
-        <input type="password" name="confirm_password" placeholder="Confirm your password" required>
+        <label>Confirm Password</label>
+        <input type="password" name="confirm_password" placeholder="Confirm your password" required aria-label="Confirm password">
+        <i class="fas fa-lock"></i>
       </div>
       <button type="submit" class="login-button">Signup</button>
     </form>
@@ -92,5 +190,117 @@
       <p>Already have an account? <a href="/login">Login here</a></p>
     </div>
   </div>
+  <script>
+    const canvas = document.getElementById('hudCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const particles = [];
+    const maxParticles = 50;
+    let mouse = { x: null, y: null, radius: 100 };
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = (Math.random() - 0.5) * 2;
+        this.size = Math.random() * 3 + 2;
+        this.lockEffect = null;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+
+        const dx = this.x - mouse.x;
+        const dy = this.y - mouse.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < mouse.radius) {
+          const force = (mouse.radius - distance) / mouse.radius;
+          this.x += dx * force * 0.05;
+          this.y += dy * force * 0.05;
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = '#00ff80';
+        ctx.fill();
+
+        if (this.lockEffect) {
+          const { alpha, size } = this.lockEffect;
+          ctx.globalAlpha = alpha;
+          ctx.font = `${size}px 'Font Awesome 6 Free'`;
+          ctx.fillStyle = '#00ff80';
+          ctx.textAlign = 'center';
+          ctx.fillText('\uf023', this.x, this.y);
+          ctx.globalAlpha = 1;
+          this.lockEffect.alpha -= 0.02;
+          this.lockEffect.size += 0.5;
+          if (this.lockEffect.alpha <= 0) this.lockEffect = null;
+        }
+      }
+    }
+
+    for (let i = 0; i < maxParticles; i++) {
+      particles.push(new Particle());
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    canvas.addEventListener('click', () => {
+      particles.forEach(particle => {
+        const dx = particle.x - mouse.x;
+        const dy = particle.y - mouse.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < mouse.radius) {
+          particle.lockEffect = { alpha: 1, size: 20 };
+        }
+      });
+    });
+
+    function connectParticles() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < 100) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(0, 255, 128, ${1 - distance / 100})`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+      connectParticles();
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
 </body>
 </html>
