@@ -3,112 +3,269 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login</title>
+  <title>Login - Database Encryption</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: Arial, sans-serif;
-      background: url('https://miro.medium.com/v2/resize:fit:1000/1*i6OnUmnsoJWPwp6AvE3uRw.gif') no-repeat center center fixed;
-      background-size: cover;
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: #0d1b2a;
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
+      overflow: hidden;
     }
-
-    /* ✅ Fade-in animation keyframes */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(40px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .login-container {
-      background: rgb(140, 203, 222);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      animation: fadeInUp 1s ease forwards; /* ✅ Animation added */
+      height: 100%;
+      z-index: -1;
+      opacity: 0.8;
     }
-
+    .login-container {
+      background: rgba(20, 29, 47, 0.9);
+      padding: 50px;
+      border-radius: 15px;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+      width: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      animation: pulse 4s ease-in-out infinite;
+    }
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      width: 410px;
+      height: calc(100% + 10px);
+      border: 2px solid #00ffff;
+      border-radius: 15px;
+      opacity: 0.4;
+      animation: scanLine 6s linear infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    @keyframes scanLine {
+      0% { transform: translateY(-100%); }
+      50% { transform: translateY(100%); }
+      100% { transform: translateY(-100%); }
+    }
     h1 {
       text-align: center;
-      font-size: 24px;
-      color: #222;
-      margin-bottom: 30px;
+      font-size: 28px;
+      color: #00ffff;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+      animation: flicker 2s infinite;
     }
-
     .input-group {
       margin-bottom: 20px;
+      position: relative;
+      animation: slideUp 0.6s ease forwards;
+      animation-delay: calc(0.15s * var(--i));
     }
-
     label {
       display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: #333;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #00ffff;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
     }
-
     input {
       width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 2px solid #ccc;
+      padding: 12px 40px 12px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #00ffff;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
       outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-
+    input:focus {
+      border-color: #ff00ff;
+      box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+    }
+    .input-group i {
+      position: absolute;
+      right: 12px;
+      top: 36px;
+      color: #00ffff;
+      font-size: 18px;
+    }
     .login-button {
       width: 100%;
-      padding: 12px;
-      background: #2979ff;
-      color: white;
+      padding: 14px;
+      background: linear-gradient(90deg, #00ffff, #ff00ff);
+      color: #0d1b2a;
       font-size: 16px;
+      font-weight: bold;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      animation: glowButton 3s infinite;
     }
-
     .login-button:hover {
-      background: #1565c0;
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
     }
-
     .register-link {
       text-align: center;
       margin-top: 20px;
     }
-
     .register-link a {
-      color: #007bff;
+      color: #ff00ff;
       text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+    .register-link a:hover {
+      color: #00ffff;
+    }
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes glowButton {
+      0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+      50% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.8); }
+    }
+    @media (max-width: 480px) {
+      .login-container {
+        width: 320px;
+        padding: 30px;
+      }
+      .login-container::before {
+        width: 330px;
+        height: calc(100% + 10px);
+      }
+      h1 {
+        font-size: 22px;
+      }
+      input, .login-button {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 <body>
+  <canvas id="hudCanvas"></canvas>
   <div class="login-container">
-    <h1>Login</h1>
+    <h1>Database Encryption</h1>
     <form action="/login" method="post">
-      <div class="input-group">
-        <label>Email address:</label>
-        <input type="email" name="username" placeholder="Enter your email" required>
+      <div class="input-group" style="--i: 1">
+        <label>Email Address</label>
+        <input type="email" name="username" placeholder="Enter your email" required aria-label="Email address">
+        <i class="fas fa-envelope"></i>
       </div>
-      <div class="input-group">
-        <label>Password:</label>
-        <input type="password" name="password" placeholder="Enter your password" required>
+      <div class="input-group" style="--i: 2">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Enter your password" required aria-label="Password">
+        <i class="fas fa-key"></i>
       </div>
       <button type="submit" class="login-button">Login</button>
     </form>
     <div class="register-link">
-      <p>Don't have an account? <a href="/">Register here</a></p>
+      <p>Don't have an account? <a href="/login">Register here</a></p>
     </div>
   </div>
+  <script>
+    const canvas = document.getElementById('hudCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const connections = [];
+    const maxConnections = 50;
+
+    class Connection {
+      constructor() {
+        this.x1 = Math.random() * width;
+        this.y1 = Math.random() * height;
+        this.x2 = Math.random() * width;
+        this.y2 = Math.random() * height;
+        this.vx1 = (Math.random() - 0.5) * 1;
+        this.vy1 = (Math.random() - 0.5) * 1;
+        this.vx2 = (Math.random() - 0.5) * 1;
+        this.vy2 = (Math.random() - 0.5) * 1;
+        this.opacity = Math.random() * 0.5 + 0.2;
+      }
+      update() {
+        this.x1 += this.vx1;
+        this.y1 += this.vy1;
+        this.x2 += this.vx2;
+        this.y2 += this.vy2;
+
+        if (this.x1 < 0 || this.x1 > width) this.vx1 *= -1;
+        if (this.y1 < 0 || this.y1 > height) this.vy1 *= -1;
+        if (this.x2 < 0 || this.x2 > width) this.vx2 *= -1;
+        if (this.y2 < 0 || this.y2 > height) this.vy2 *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.moveTo(this.x1, this.y1);
+        ctx.lineTo(this.x2, this.y2);
+        ctx.strokeStyle = `rgba(0, 255, 255, ${this.opacity})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(this.x1, this.y1, 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff00ff';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(this.x2, this.y2, 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff00ff';
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < maxConnections; i++) {
+      connections.push(new Connection());
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      connections.forEach(connection => {
+        connection.update();
+        connection.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script> 
 </body>
 </html>
