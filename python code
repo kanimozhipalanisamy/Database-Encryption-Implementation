@@ -4,16 +4,17 @@ import base64
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import os
+from cryptography.hazmat.primitives import padding
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 
-# Encryption keys
-AES_KEY = os.urandom(32)  # 32 bytes for AES-256
-TDE_KEY = os.urandom(24)   # 24 bytes for Triple DES
+# 🔒 Use fixed keys instead of os.urandom
+AES_KEY = b'0123456789abcdef0123456789abcdef'  # 32 bytes for AES-256
+TDE_KEY = b'0123456789abcdef01234567'          # 24 bytes for Triple DES
 BACKEND = default_backend()
 
-# AES Encryption Functions (as in your original code)
+# AES Encryption Functions
 def encrypt_aes(text):
     iv1 = os.urandom(16)
     cipher1 = Cipher(algorithms.AES(AES_KEY), modes.CFB(iv1), backend=BACKEND)
@@ -45,43 +46,36 @@ def decrypt_aes(encoded):
 
 # Triple DES (TDE) Encryption Functions
 def encrypt_tde(text):
-    # Triple DES requires 8-byte IV for CBC mode
     iv = os.urandom(8)
     cipher = Cipher(algorithms.TripleDES(TDE_KEY), modes.CBC(iv), backend=BACKEND)
     encryptor = cipher.encryptor()
-    
-    # Pad the data to be a multiple of 8 bytes (Triple DES block size)
-    pad_length = 8 - (len(text) % 8)
-    padded_text = text.encode() + bytes([pad_length] * pad_length)
-    
-    encrypted = encryptor.update(padded_text) + encryptor.finalize()
+
+    padder = padding.PKCS7(64).padder()
+    padded_data = padder.update(text.encode()) + padder.finalize()
+
+    encrypted = encryptor.update(padded_data) + encryptor.finalize()
     return base64.b64encode(iv + encrypted).decode()
 
 def decrypt_tde(encoded):
     data = base64.b64decode(encoded.encode())
     iv = data[:8]
     encrypted = data[8:]
-    
+
     cipher = Cipher(algorithms.TripleDES(TDE_KEY), modes.CBC(iv), backend=BACKEND)
     decryptor = cipher.decryptor()
     decrypted_padded = decryptor.update(encrypted) + decryptor.finalize()
-    
-    # Remove padding
-    pad_length = decrypted_padded[-1]
-    decrypted_text = decrypted_padded[:-pad_length]
-    return decrypted_text.decode()
+
+    unpadder = padding.PKCS7(64).unpadder()
+    decrypted = unpadder.update(decrypted_padded) + unpadder.finalize()
+    return decrypted.decode()
 
 # Combined Encryption (AES + TDE)
 def encrypt_combined(text):
-    # First encrypt with AES
     aes_encrypted = encrypt_aes(text)
-    # Then encrypt the AES result with TDE
     return encrypt_tde(aes_encrypted)
 
 def decrypt_combined(encoded):
-    # First decrypt with TDE
     tde_decrypted = decrypt_tde(encoded)
-    # Then decrypt the result with AES
     return decrypt_aes(tde_decrypted)
 
 # Initialize DB
@@ -93,10 +87,13 @@ def init_db():
 def home():
     if 'username' in session:
         return f"Welcome {session['username']}! <a href='/logout'>Logout</a>"
-    return render_template('register.html')
+    return redirect('/register')
 
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
+    if request.method == 'GET':
+        return render_template('register.html')
+    
     username = request.form['username']
     password = request.form['password']
     confirm_password = request.form['confirm_password']
@@ -105,11 +102,10 @@ def register():
         return '''
             <script>
                 alert("Passwords do not match.");
-                window.location.href = "/";
+                window.location.href = "/register";
             </script>
         '''
 
-    # Using combined encryption (AES + TDE)
     encrypted_password = encrypt_combined(password)
 
     try:
@@ -125,7 +121,7 @@ def register():
         return '''
             <script>
                 alert("Account already exists! Try another email.");
-                window.location.href = "/";
+                window.location.href = "/register";
             </script>
         '''
 
@@ -141,28 +137,39 @@ def login():
         cursor = conn.execute("SELECT password FROM users WHERE username = ?", (username,))
         result = cursor.fetchone()
 
-    if result:
-        try:
-            # Using combined decryption (TDE + AES)
-            decrypted_password = decrypt_combined(result[0])
-            if password == decrypted_password:
-                session['username'] = username
-                return '''
-                    <script>
-                        alert("Login successful!");
-                        window.location.href = "/";
-                    </script>
-                '''
-        except Exception as e:
-            print(f"Decryption error: {e}")  # Log the error for debugging
-            pass  # Ignore decryption errors
+    if not result:
+        return '''
+            <script>
+                alert("Username not found.");
+                window.location.href = "/login";
+            </script>
+        '''
 
-    return '''
-        <script>
-            alert("Invalid credentials. Try again.");
-            window.location.href = "/login";
-        </script>
-    '''
+    try:
+        decrypted_password = decrypt_combined(result[0])
+        if password == decrypted_password:
+            session['username'] = username
+            return '''
+                <script>
+                    alert("Login successful!");
+                    window.location.href = "/";
+                </script>
+            '''
+        else:
+            return '''
+                <script>
+                    alert("Invalid password.");
+                    window.location.href = "/login";
+                </script>
+            '''
+    except Exception as e:
+        print(f"Decryption error: {e}")
+        return '''
+            <script>
+                alert("Authentication error. Please try again.");
+                window.location.href = "/login";
+            </script>
+        '''
 
 @app.route('/logout')
 def logout():
